@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import { getAllTasks,deleteTask, getTaskId } from '../redux/reducers/taskSlice';
 
 import { showDeleteConfirmation } from '../utils/alert';
-
+import  CreateTask  from '../screens/sub/CreateTask';
 
 const TasksScreen = ({navigation}) => {
   const dispatch = useDispatch()
@@ -45,6 +45,7 @@ const TasksScreen = ({navigation}) => {
           <View style={styles.textContainer}>
             <Text style={styles.cardTitle}>{item.content}</Text>
             <Text style={styles.cardDescription}>{item.description}</Text>
+            <Text style={styles.createdAt}>{item.created_at}</Text>
           </View>
           <TouchableOpacity onPress={()=>handleDeleteTask(item.id)} style={styles.deleteButton}>
             <Ionicons name="trash" size={24} color="red" />
@@ -53,6 +54,7 @@ const TasksScreen = ({navigation}) => {
       )}
       ListEmptyComponent={<Text style={styles.emptyText}>Nothing To Show</Text>}
     />
+    <CreateTask/>
   </SafeAreaView>
   )
 }
@@ -102,6 +104,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: 'gray',
-  },});
+  },
+  createdAt:{
+    fontSize:10,
+    marginTop:10
+  }});
 
 export default TasksScreen;

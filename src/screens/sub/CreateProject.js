@@ -8,20 +8,23 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native"
+
+import WheelColorPicker from "react-native-wheel-color-picker"
+
 import { Ionicons, FontAwesome } from "@expo/vector-icons"
 import { useSelector, useDispatch } from "react-redux"
-import { createProject } from "../../redux/reducers/sub/createProjectSlice"
+import { createProject } from "../../redux/reducers/projectsSlice"
 import {
   setProjectName,
   setProjectColor,
   setFavourite,
   resetProjectForm,
+  setModalVisible,
 } from "../../redux/reducers/sub/createProjectSlice"
 
 export default function CreateProject() {
   const dispatch = useDispatch()
-  const [modalVisible, setModalVisible] = useState(false)
-  const { name, color, isFavourite } = useSelector(
+  const { name, color, isFavourite, modalVisible } = useSelector(
     (state) => state.projectCreate
   )
 
@@ -32,22 +35,22 @@ export default function CreateProject() {
     user_id: userid,
     name: name,
     color: color,
-    isFavourite: isFavourite,
+    is_favourite: isFavourite,
   }
 
   const handleCreate = () => {
-   
     dispatch(createProject(projectData))
       .then((response) => {
         if (response.error) {
           console.log(response.error.message)
         } else {
-          dispatch(clearForm())
+          dispatch(resetProjectForm())
         }
       })
       .catch((err) => {
-        dispatch(setErrorMessage("Enter valid data inside fields",err))
+        throw new Error("Enter valid data inside fields")
       })
+    dispatch(setModalVisible(false))
   }
 
   return (
@@ -56,7 +59,7 @@ export default function CreateProject() {
         transparent
         visible={modalVisible}
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => dispatch(setModalVisible(false))}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -68,12 +71,18 @@ export default function CreateProject() {
               style={styles.input}
               placeholder="Project Name"
             />
-            <Text>Enter Color Name</Text>
-            <TextInput
-              value={color}
-              onChangeText={(text) => dispatch(setProjectColor(text))}
-              style={styles.input}
-            />
+            <Text>Select Project Color</Text>
+            <View style={styles.colorPickerWrapper}>
+              <WheelColorPicker
+                color={color}
+                onColorChangeComplete={(selectedColor) =>
+                  dispatch(setProjectColor(selectedColor))
+                }
+                thumbStyle={{ height: 24, width: 24, borderRadius: 12 }}
+                sliderHidden={true}
+              />
+            </View>
+
             <TouchableOpacity
               onPress={() => dispatch(setFavourite(!isFavourite))}
               style={styles.favoriteButton}
@@ -94,7 +103,10 @@ export default function CreateProject() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalButton}
-                onPress={() => setModalVisible(false)}
+                onPress={() => {
+                  dispatch(setModalVisible(false))
+                  dispatch(resetProjectForm())
+                }}
               >
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
@@ -105,7 +117,7 @@ export default function CreateProject() {
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => setModalVisible(true)}
+        onPress={() => dispatch(setModalVisible(true))}
       >
         <Ionicons name="add-circle" size={64} color="#007AFF" />
       </TouchableOpacity>
@@ -145,6 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    marginTop:30
   },
   favoriteText: {
     marginLeft: 8,
@@ -172,4 +185,11 @@ const styles = StyleSheet.create({
     bottom: 30,
     right: 30,
   },
+  colorPickerWrapper: {
+    width: 210,
+    height: 210,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 12,
+  }
 })

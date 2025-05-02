@@ -4,7 +4,7 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (regData) => {
     try {
-      const response = await fetch("http://10.10.5.246:3000/api/users", {
+      const response = await fetch("http://192.168.1.74:3000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -17,6 +17,7 @@ export const registerUser = createAsyncThunk(
       }
 
       const data = await response.json()
+      console.log("response from backend:", data)
       return data
 
     } catch (error) {

@@ -7,6 +7,8 @@ import projectReducer from '../reducers/projectsSlice'
 import taskReducer from '../reducers/taskSlice'
 import commentReducer from '../reducers/commentsSlice'
 import createProjectReducer from '../reducers/sub/createProjectSlice'
+import createTaskReducer from '../reducers/sub/createTaskSlice'
+import createCommentReducer from '../reducers/sub/createCommentSlice'
 
 const store = configureStore({
     reducer:{
@@ -15,9 +17,13 @@ const store = configureStore({
         projects:projectReducer,
         tasks:taskReducer,
         comments:commentReducer,
-        projectCreate:createProjectReducer
+        projectCreate:createProjectReducer,
+        taskCreate:createTaskReducer,
+        commentCreate:createCommentReducer
     },
 })
 
 export default store
+
+
 

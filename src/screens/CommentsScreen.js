@@ -12,6 +12,7 @@ import { getAllComments } from "../redux/reducers/commentsSlice"
 import { useSelector, useDispatch } from "react-redux"
 import { useEffect } from "react"
 import { deleteComment } from "../redux/reducers/commentsSlice"
+import CreateComment from '../screens/sub/CreateComment'
 
 import { showDeleteConfirmation } from "../utils/alert"
 
@@ -59,6 +60,7 @@ function CommentsScreen() {
           <Text style={styles.emptyText}>No Comments Yet</Text>
         }
       />
+      <CreateComment/>
     </SafeAreaView>
   )
 }

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export  const getAllProjectsForUser = createAsyncThunk('projects',async (userId)=>{
   try {
-    const response =  await fetch(`http://10.10.5.246:3000/api/projects/user/${userId}`,{
+    const response =  await fetch(`http://192.168.1.74:3000/api/projects/user/${userId}`,{
         method:'GET',
         headers:{
             'Content-Type': 'application/json',
@@ -14,7 +14,6 @@ export  const getAllProjectsForUser = createAsyncThunk('projects',async (userId)
       }
     
       const projectsData = await response.json();
-    //   console.log("projects------>",projectsData)
       return projectsData
   } catch (error) {
     console.log(error)
@@ -23,7 +22,7 @@ export  const getAllProjectsForUser = createAsyncThunk('projects',async (userId)
 
 export const deleteProject = createAsyncThunk('deleteProject',async(projectId)=>{
    try {
-    const response  = await fetch(`http://10.10.5.246:3000/api/projects/${projectId}`,{
+    const response  = await fetch(`http://192.168.1.74:3000/api/projects/${projectId}`,{
         method:'DELETE',
         headers:{
             'Content-Type': 'application/json',
@@ -39,6 +38,30 @@ export const deleteProject = createAsyncThunk('deleteProject',async(projectId)=>
     console.log(error)
    }
 })
+
+export const createProject = createAsyncThunk(
+    "project/createProject",
+    async (projectData, { rejectWithValue }) => {
+      try {
+        const response = await fetch("http://192.168.1.74:3000/api/projects", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(projectData),
+        })
+  
+        if (!response.ok) {
+          throw new Error("Project creation failed")
+        }
+        
+        const data = await response.json()
+        return data
+      } catch (error) {
+        return rejectWithValue(error.message)
+      }
+    }
+  )
 
 
 const projectsSlice = createSlice({
@@ -73,9 +96,13 @@ const projectsSlice = createSlice({
             state.projects = state.projects.filter(project => project.id !== action.payload)
             state.error = null
           })
+          .addCase(createProject.fulfilled, (state, action) => {
+            const newProject = Array.isArray(action.payload) ? action.payload[0] : action.payload
+            state.projects.push(newProject)         
+         })
     }
 })
 
-export const {getProjectId} = projectsSlice.actions
+export const { getProjectId } = projectsSlice.actions
 
 export default projectsSlice.reducer

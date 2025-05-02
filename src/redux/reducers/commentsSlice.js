@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 export const getAllComments = createAsyncThunk("comments", async (taskId) => {
   try {
     const response = await fetch(
-      `http://10.10.5.246:3000/api/comments/task/${taskId}`,
+      `http://192.168.1.74:3000/api/comments/task/${taskId}`,
       {
         method: "GET",
         headers: {
@@ -28,7 +28,7 @@ export const deleteComment = createAsyncThunk(
   async (commentId) => {
     try {
       const response = await fetch(
-        `http://10.10.5.246:3000/api/comments/${commentId}`,
+        `http://192.168.1.74:3000/api/comments/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -47,6 +47,32 @@ export const deleteComment = createAsyncThunk(
     }
   }
 )
+
+export const createComment = createAsyncThunk("createComment", async ({projectID,taskId,commentData}) => {
+  try {
+    const response = await fetch(
+      `http://192.168.1.74:3000/api/comments/${projectID}/${taskId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body:JSON.stringify(commentData)
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error("failed to create the comments")
+    }
+
+    const data = await response.json()
+    return data
+
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 
 const commentsSlice = createSlice({
   name: "comments",
@@ -72,6 +98,10 @@ const commentsSlice = createSlice({
       })
       .addCase(deleteComment.fulfilled, (state, action) => {
         state.comments = state.comments.filter((item) => item.id !== action.payload)
+      })
+      .addCase(createComment.fulfilled, (state, action) => {
+         const  newComment = Array.isArray(action.payload) ? action.payload[0] : action.payload
+         state.comments.push(newComment)    
       })
   },
 })
